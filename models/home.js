@@ -6,6 +6,7 @@ let homeSchema = mongoose.Schema({
   price: { type: String, required: true },
   location: { type: String, required: true },
   rating: { type: String, required: true },
+  photo: { type: String, required: true },
   description: String,
 });
 

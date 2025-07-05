@@ -41,22 +41,41 @@ exports.getHostHomes = (req, res, next) => {
 };
 
 exports.postHome = (req, res, next) => {
-  const { houseName, price, location, rating, description, id } = req.body;
-  let home = new Home({ houseName, price, location, rating, description, id });
+  const { houseName, price, location, rating, description, id } =
+    req.body;
+const photo = req.file.path;
+if(!req.file){
+  return res.send("File Not Supported")
+}
+  let home = new Home({
+    houseName,
+    price,
+    location,
+    rating,
+    photo,
+    description,
+    id,
+  });
   home.save().then(() => {
     console.log("Home Added Successfully");
   });
   res.redirect("/host/host-home-list");
 };
 exports.postEditHome = (req, res, next) => {
-  const { id, houseName, price, location, rating, description } = req.body;
+  const { id, houseName, price, location, rating, description } =
+  req.body;
   Home.findById(id)
     .then((home) => {
       (home.houseName = houseName),
         (home.price = price),
         (home.location = location),
         (home.rating = rating),
-        (home.description = description),
+        home.description = description;
+
+      if(req.file){
+        home.photo = req.file.path
+      }
+
         home
           .save()
           .then((result) => {
