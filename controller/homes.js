@@ -67,8 +67,6 @@ exports.postRemoveToFavourite = async (req, res) => {
     findUser.favourites = findUser.favourites.filter((fav) => fav != homeId);
     await findUser.save();
   }
-  console.log(findUser.favourites);
-
   res.redirect("/favourite");
 };
 
