@@ -19,38 +19,43 @@ let store = new MongoDBSession({
   collection: "sessions",
 });
 
-let randomString = (length)=>{
-  let charactor = 'abcdefghijklmnopqrstuvwxyz'
-  let result = ''
+let randomString = (length) => {
+  let charactor = "abcdefghijklmnopqrstuvwxyz";
+  let result = "";
   for (let i = 0; i < length; i++) {
-    result += charactor.charAt(Math.floor(Math.random() * charactor.length))    
+    result += charactor.charAt(Math.floor(Math.random() * charactor.length));
   }
-  return result
-}
+  return result;
+};
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/')
+    if (file.fieldname === "photo") cb(null, "uploads/");
+    else if (file.fieldname === "rules") cb(null, "rules/");
   },
   filename: function (req, file, cb) {
-    cb(null, randomString(10) + '-' + file.originalname)
-  }
-})
+    cb(null, randomString(10) + "-" + file.originalname);
+  },
+});
 
-const fileFilter = (req, file, cb)=>{
-  if (file.mimetype === 'image/png' ||file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' ) {
-    cb(null,true)
-  }else{
-    cb(null,false)
-  }
-}
+const fileFilter = (req, file, cb) => {
+  let okImg = ["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype);
+  let okPdf = file.mimetype == "application/pdf";
+  okImg || okPdf ? cb(null, true) : cb(null, false);
+};
 
-app.use(multer({storage,fileFilter}).single("photo"));
+app.use(
+  multer({ storage, fileFilter }).fields([
+    { name: "photo", maxCount: 1 },
+    { name: "rules", maxCount: 1 },
+  ])
+);
 app.use(express.urlencoded());
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads",express.static(path.join(__dirname, "uploads")));
-app.use("/host/uploads",express.static(path.join(__dirname, "uploads")));
-app.use("/home/uploads",express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/rules", express.static(path.join(__dirname, "rules")));
+app.use("/host/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/home/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(
   session({

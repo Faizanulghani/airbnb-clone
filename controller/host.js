@@ -1,6 +1,6 @@
 const { error } = require("console");
 const Home = require("../models/home");
-let fs = require("fs")
+let fs = require("fs");
 
 exports.addHome = (req, res, next) => {
   res.render("host/edit-home", {
@@ -43,18 +43,18 @@ exports.getHostHomes = (req, res, next) => {
 };
 
 exports.postHome = (req, res, next) => {
-  const { houseName, price, location, rating, description, id } =
-    req.body;
-const photo = req.file.path;
-if(!req.file){
-  return res.send("File Not Supported")
-}
+  const { houseName, price, location, rating, description, id } = req.body;
+  if (!req.files.photo || !req.files.rules)
+    return res.send("Both files required");
+  const photo = req.files.photo[0].path;
+  const rules = req.files.rules[0].path;
   let home = new Home({
     houseName,
     price,
     location,
     rating,
     photo,
+    rules,
     description,
     id,
   });
@@ -64,33 +64,40 @@ if(!req.file){
   res.redirect("/host/host-home-list");
 };
 exports.postEditHome = (req, res, next) => {
-  const { id, houseName, price, location, rating, description } =
-  req.body;
+  const { id, houseName, price, location, rating, description } = req.body;
   Home.findById(id)
     .then((home) => {
       (home.houseName = houseName),
         (home.price = price),
         (home.location = location),
         (home.rating = rating),
-        home.description = description;
+        (home.description = description);
 
-      if(req.file){
-        fs.unlink(home.photo,(err)=>{
+      if (req.files.photo) {
+        fs.unlink(home.photo, (err) => {
           if (err) {
-            console.log("Error while deleting file",err);
+            console.log("Error while deleting file", err);
           }
-        })
-        home.photo = req.file.path
+        });
+        home.photo = req.files.photo[0].path;
+      }
+      if (req.files.rules) {
+        fs.unlink(home.photo, (err) => {
+          if (err) {
+            console.log("Error while deleting file", err);
+          }
+        });
+        home.rules = req.files.rules[0].path;
       }
 
-        home
-          .save()
-          .then((result) => {
-            console.log("Home Updated", result);
-          })
-          .catch((err) => {
-            console.log("Home While Updating", err);
-          });
+      home
+        .save()
+        .then((result) => {
+          console.log("Home Updated", result);
+        })
+        .catch((err) => {
+          console.log("Home While Updating", err);
+        });
       res.redirect("/host/host-home-list");
     })
     .catch((err) => {

@@ -35,10 +35,16 @@
                           <span class="text-yellow-400 text-xl">★</span>
                           <span class="ml-2 text-lg"><%= home.rating %> / 5</span>
                       </div>
+                        <a href="/<%= home.rules %>" class="inline-flex items-center text-blue-600 hover:text-blue-800 mt-5">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
+                            </svg>
+                            Download your Rules
+                        </a>
                       <div class="mt-2">
                         <%- include('../partials/favourite.ejs') %>
                       </div>
-                  </div>
+                    </div>
               </div>
           </div>
     </main>
